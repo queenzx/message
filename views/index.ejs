@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        .item1{
+            margin: 30px auto;
+            padding: 20px;
+            width: 40%;
+        }
+        .item2{
+            padding: 10px;
+            border: 1px solid grey;
+        }
+    </style>
+</head>
+<body>
+    <div class="item1">
+        <h1>留言</h1>
+        <form action="/message/tijiao" method="post">
+            用户名:&nbsp;&nbsp;<input type="text" name="username"><br><br>
+            留言内容:&nbsp;<textarea name="con"></textarea><br><br>
+            <input type="submit" value="提交">
+        </form>
+        <br>
+        <hr>
+    </div>
+    <%for(var i=0;i< docs.length;i++){ %>
+    <div class="item1 item2">
+        <input type="hidden" name="id" value="<%= docs[i]._id %>">
+        <h4><span><%= docs[i].username %></span> 说:</h4>
+        <p></p>
+        <p class="con"><%= docs[i].con %></p>
+        <p><%= docs[i].date %></p>
+        <a href="/message/update?id=<%= docs[i]._id %>">编辑</a>
+        <a href="javascript:;" onclick="send(this)">删除</a>
+    </div>
+    <% } %>
+    <script src="/js/jquery.min.js"></script>
+    <script>
+        function send(i){
+            var username = $(i).parent().find('span').html();
+            // console.log(username);
+            var id = $(i).parent().find('input').val();
+            var con = $(i).parent().children('p.con').html();
+            var res = confirm("确认删除:"+username+"的"+con+"留言吗?");
+             if(!res){ //点击取消,不删除
+                return ;
+            }
+            // 点击确定,删除留言,发送请求给后台
+            $.ajax({
+                // url:'/message/delete?con='+con,
+                url:'/message/delete?id='+id,
+                success:function(result){
+                    alert(result.msg);
+                    if(result.status == 0){
+                        // 删除成功
+                        $(i).parent().remove();
+                        location.href = "/";
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
